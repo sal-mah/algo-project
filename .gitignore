@@ -1,0 +1,58 @@
+# Build and compiled files
+build/
+Debug/
+Release/
+cmake_build_debug/
+cmake_build_release/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.o
+*.a
+*.so
+*.lib
+*.dll
+*.exe
+*.out
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.cbp
+*.layout
+*.codeblocks
+*.user
+.DS_Store
+Thumbs.db
+
+# Dependency and package files
+*.d
+CMakeLists.txt.user
+*.cmake
+
+# Temporary and backup files
+*~
+*.swp
+*.swo
+*.tmp
+*.backup
+.#*
+
+# OS-specific files
+.AppleDouble
+.LSOverride
+._*
+
+# Results and output files (if not tracking benchmarks)
+results/*.txt
+results/*.csv
+results/*.json
+
+# Executable in root
+*.bin
+
