@@ -41,7 +41,7 @@ public:
     // Creates a fresh game on an NxN board with K-in-a-row win.
     // X always goes first.
     // ----------------------------------------------------------
-    GameState(int n, int k);
+    GameState(int n, int k);  // n is boardSize / k is winLength
 
     // ----------------------------------------------------------
     // isTerminal()

@@ -51,7 +51,7 @@ public:
     // n = board size (3 for 3x3, 4 for 4x4, 5 for 5x5)
     // k = how many in a row to win (usually same as n, but configurable)
     // ----------------------------------------------------------
-    Board(int n, int k);
+    Board(int n, int k);    // n is boardSize / k is winLength
 
     // ----------------------------------------------------------
     // placeMark(row, col, cell)
