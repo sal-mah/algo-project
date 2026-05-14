@@ -1,116 +1,57 @@
-#include "BruteForceSolver.h"
 #include <iostream>
-using namespace std;
+#include <fstream>
+#include <chrono>
+#include "../include/BruteForceSolver.h"
+#include "../include/DPSolver.h"
+using namespace std; 
 
-// Prints the board nicely to the console
-void printBoard(GameState& state) {
-    Board& b = state.getBoard();
-    int n = b.getN();
-    cout << "\n";
-    for (int r = 0; r < n; r++) {
-        cout << "  ";
-        for (int c = 0; c < n; c++) {
-            Cell cell = b.getCell(r, c);
-            char ch = (cell == Cell::X) ? 'X' : (cell == Cell::O) ? 'O' : '.';
-            cout << " " << ch;
-            if (c < n - 1) cout << " |";
-        }
-        cout << "\n";
-        if (r < n - 1) {
-            cout << "  ";
-            for (int c = 0; c < n; c++) cout << "---" << (c < n - 1 ? "+" : "");
-            cout << "\n";
+int main(){
+    ofstream csv("results/data.csv", ios::out);
+    csv << unitbuf; // flush after every write
+    cout << "Opening file...\n";
+    if (!csv.is_open()) {
+        cout << "ERROR: Could not open file!\n";
+        return 1;
+    }
+    cout << "File opened!\n";    
+    
+    csv << "solver,board,depth,nodes,timeMs,cacheHits\n";
+
+    int boardSizes[] = {3, 4, 5};
+    int depths[] = {2, 4, 6, 8};
+    int maxDepthForBF = 4;
+    int maxBoardForBF = 3;
+
+        for(int n : boardSizes){
+        for(int d : depths ){
+            cout << "Running N=" << n << " D=" << d << "...\n";
+            GameState state(n,n);
+
+
+            if (n <= maxBoardForBF && d <= maxDepthForBF) {
+                 BruteForceSolver bf;
+                 bf.resetMetrics();
+                bf.getBestMove(state);
+                Metrics bfm = bf.getMetrics();
+                  csv << "BruteForce," << n << ", " << d << ", " << bfm.nodesExplored << ", " << bfm.timeMs << ", " << bfm.cacheHits << "\n";
+            } else {
+                csv << "BruteForce," << n << ", " << d << ", TIMEOUT, TIMEOUT, 0\n";
+            }
+
+
+            if (n == 5 && d == 8) {
+                csv << "DP,5,8,TIMEOUT,TIMEOUT,0\n";
+            } else {
+                DPSolver dp(d);
+                dp.resetMetrics();
+                dp.getBestMove(state);
+                 Metrics dpm = dp.getMetrics();
+                csv << "DP, " << n << ", " << d << ", " << dpm.nodesExplored << ", " << dpm.timeMs << ", " << dpm.cacheHits << "\n";
+            }
         }
     }
-    cout << "\n";
-}
-
-int main() {
-    cout << "==============================================\n";
-    cout << "   BruteForceSolver — Minimax Test Suite\n";
-    cout << "==============================================\n";
-
-    // ── Test 1: X should win immediately ─────────────────────────────────────
-    // Board:         Expected: X picks (0,1) to complete top row
-    //   X . X
-    //   . O .
-    //   . O .
-    cout << "\nTest 1: X can win RIGHT NOW\n";
-    cout << "Board:\n";
-    GameState state1(3, 3);
-    state1.getBoard().placeMark(0, 0, Cell::X);
-    state1.getBoard().placeMark(0, 2, Cell::X);
-    state1.getBoard().placeMark(1, 1, Cell::O);
-    state1.getBoard().placeMark(2, 1, Cell::O);
-    printBoard(state1);
-
-    BruteForceSolver solver1;
-    solver1.resetMetrics();
-    Move best1 = solver1.getBestMove(state1);
-    cout << "Best move for X: (" << best1.row << ", " << best1.col << ")\n";
-    cout << "Expected:        (0, 1)  <- completes top row\n";
-    cout << "Nodes explored:  " << solver1.getMetrics().nodesExplored << "\n";
-    cout << "Time:            " << solver1.getMetrics().timeMs << " ms\n";
-    cout << (best1.row == 0 && best1.col == 1 ? "PASS" : "FAIL") << "\n";
-
-    // ── Test 2: O must block X from winning ───────────────────────────────────
-    // Board:         Expected: O picks (0,2) to block X
-    //   X X .
-    //   . O .
-    //   . . .
-    cout << "\n----------------------------------------------\n";
-    cout << "Test 2: O must BLOCK X at (0,2)\n";
-    cout << "Board:\n";
-    GameState state2(3, 3);
-    state2.getBoard().placeMark(0, 0, Cell::X);
-    state2.getBoard().placeMark(0, 1, Cell::X);
-    state2.getBoard().placeMark(1, 1, Cell::O);
-    // It is now O's turn
-    state2.switchPlayer();
-    printBoard(state2);
-
-    BruteForceSolver solver2;
-    solver2.resetMetrics();
-    Move best2 = solver2.getBestMove(state2);
-    cout << "Best move for O: (" << best2.row << ", " << best2.col << ")\n";
-    cout << "Expected:        (0, 2)  <- blocks X from winning\n";
-    cout << "Nodes explored:  " << solver2.getMetrics().nodesExplored << "\n";
-    cout << "Time:            " << solver2.getMetrics().timeMs << " ms\n";
-    cout << (best2.row == 0 && best2.col == 2 ? "PASS" : "FAIL") << "\n";
-
-    // ── Test 3: Only one move left — forced ───────────────────────────────────
-    // Board:         Expected: X picks (2,2) — only empty cell
-    //   X O X
-    //   O X O
-    //   O X .
-    cout << "\n----------------------------------------------\n";
-    cout << "Test 3: One move left — forced\n";
-    cout << "Board:\n";
-    GameState state3(3, 3);
-    state3.getBoard().placeMark(0, 0, Cell::X);
-    state3.getBoard().placeMark(0, 1, Cell::O);
-    state3.getBoard().placeMark(0, 2, Cell::X);
-    state3.getBoard().placeMark(1, 0, Cell::O);
-    state3.getBoard().placeMark(1, 1, Cell::X);
-    state3.getBoard().placeMark(1, 2, Cell::O);
-    state3.getBoard().placeMark(2, 0, Cell::O);
-    state3.getBoard().placeMark(2, 1, Cell::X);
-    printBoard(state3);
-
-    BruteForceSolver solver3;
-    solver3.resetMetrics();
-    Move best3 = solver3.getBestMove(state3);
-    cout << "Best move for X: (" << best3.row << ", " << best3.col << ")\n";
-    cout << "Expected:        (2, 2)  <- only cell left\n";
-    cout << "Nodes explored:  " << solver3.getMetrics().nodesExplored << "\n";
-    cout << "Time:            " << solver3.getMetrics().timeMs << " ms\n";
-    cout << (best3.row == 2 && best3.col == 2 ? "PASS" : "FAIL") << "\n";
-
-    // ── Summary ───────────────────────────────────────────────────────────────
-    cout << "\n==============================================\n";
-    cout << "   All tests done!\n";
-    cout << "   BruteForceSolver is working correctly.\n";
-    cout << "==============================================\n";
-
+    
+    csv.close();
+    cout << "Done! Results saved to results/data.csv\n";
     return 0;
 }
