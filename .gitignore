@@ -4,6 +4,8 @@ Debug/
 Release/
 cmake_build_debug/
 cmake_build_release/
+cmake-build-*/
+cmake-build*/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake

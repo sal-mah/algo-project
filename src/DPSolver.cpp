@@ -3,7 +3,6 @@
 //
 
 #include "../include/DPSolver.h"
-#include "../include/DPSolver.h"
 #include <chrono>
 #include <limits>
 
@@ -59,7 +58,7 @@ int DPSolver::minimax(GameState& state, int depth, bool isMaximizing) {
     metrics.nodesExplored++;
 
     // --- Cache lookup (the only difference from BruteForce) ---
-    std::string key = state.getBoard().getKey();
+    std::string key = state.getBoard().getKey() + "|" + std::to_string(depth);
     auto cached = cache.get(key);
     if (cached.has_value()) {
         metrics.cacheHits++;
@@ -81,7 +80,8 @@ int DPSolver::minimax(GameState& state, int depth, bool isMaximizing) {
     if (isMaximizing) {
         score = std::numeric_limits<int>::min();
         for (const Move& move : moves) {
-            board.placeMark(move.row, move.col, Cell::X);
+            Cell currentCell = state.getCurrentPlayer();
+            board.placeMark(move.row, move.col, currentCell);
             state.switchPlayer();
 
             int val = minimax(state, depth - 1, false);
@@ -94,7 +94,8 @@ int DPSolver::minimax(GameState& state, int depth, bool isMaximizing) {
     } else {
         score = std::numeric_limits<int>::max();
         for (const Move& move : moves) {
-            board.placeMark(move.row, move.col, Cell::O);
+            Cell currentCell = state.getCurrentPlayer();
+            board.placeMark(move.row, move.col, currentCell);
             state.switchPlayer();
 
             int val = minimax(state, depth - 1, true);

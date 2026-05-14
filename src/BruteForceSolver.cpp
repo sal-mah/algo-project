@@ -1,6 +1,11 @@
 #include "BruteForceSolver.h"
 #include <limits>
 #include <chrono>
+#include <algorithm>
+// ── constructor ─────────────────────────────────────────────────────────────
+BruteForceSolver::BruteForceSolver(int depth)
+    : maxDepth(depth) {}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  BruteForceSolver.cpp
@@ -128,9 +133,11 @@ Move BruteForceSolver::getBestMove(GameState& state) {
         bestScore = std::numeric_limits<int>::max();
     }
 
-    // Search depth = number of empty cells (full search) as a reasonable default.
-    // Dev 4 can expose this as a parameter if needed for the benchmark.
+    // Search depth defaults to a full search unless maxDepth is provided.
     int depth = static_cast<int>(moves.size());
+    if (maxDepth > 0) {
+        depth = std::min(maxDepth, depth);
+    }
 
     for (const Move& m : moves) {
         board.placeMark(m.row, m.col, currentCell);

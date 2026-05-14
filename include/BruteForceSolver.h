@@ -47,6 +47,7 @@
 class BruteForceSolver : public ISolver {
 public:
     BruteForceSolver() = default;
+    explicit BruteForceSolver(int depth);
     ~BruteForceSolver() override = default;
 
     // ----------------------------------------------------------
@@ -70,6 +71,7 @@ public:
 
 private:
     Metrics metrics;   // Filled in during each getBestMove() call
+    int maxDepth = -1; // -1 means full search
 
     // ----------------------------------------------------------
     // minimax(state, depth, isMaximizing)
