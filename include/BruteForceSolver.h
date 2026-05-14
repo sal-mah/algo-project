@@ -13,76 +13,72 @@
 //
 // HOW MINIMAX WORKS HERE:
 //   1. If state is terminal → return its score (+1, -1, or 0)
-//   2. If X's turn (Maximizer) → try all moves, return the MAX score
-//   3. If O's turn (Minimizer) → try all moves, return the MIN score
+//   2. If depth == 0        → return 0 (no heuristic)
+//   3. If X's turn (Maximizer) → try all moves, return MAX score
+//   4. If O's turn (Minimizer) → try all moves, return MIN score
+//
 //   For each move:
-//     - board.placeMark()     ← apply the move
-//     - state.switchPlayer()  ← change turn
-//     - recurse               ← evaluate the result
-//     - board.undoMark()      ← undo the move (backtrack)
-//     - state.switchPlayer()  ← restore the turn
+//     board.placeMark(row, col, cell)  ← apply the move
+//     state.switchPlayer()             ← flip the turn
+//     recurse                          ← evaluate the result
+//     state.switchPlayer()             ← restore the turn
+//     board.undoMark(row, col)         ← undo the move (backtrack)
 //
 // WHY IT'S SLOW:
 //   Two different move sequences can reach the same board state.
-//   Brute force has no memory — it recomputes the entire subtree
-//   from that board every time. On a 5x5 board at depth 8,
-//   this causes a timeout because the same states are recomputed
-//   thousands of times.
-//   Time complexity: O(b^d) where b = empty cells, d = depth
-//
-// HOW IT FITS IN THE PROJECT:
-//   BruteForceSolver is X (the Maximizer) in the benchmark.
-//   It competes against DPSolver on the same board positions.
-//   The benchmark compares their metrics side by side.
+//   Brute force has no memory — it recomputes the full subtree
+//   every single time. On a 5×5 board at depth 8 this causes a
+//   timeout because the same states are recomputed thousands of
+//   times. Time complexity: O(b^d) where b = empty cells, d = depth.
 //
 // IMPORTANT NOTES FOR TEAMMATES:
-//   - Do NOT add any caching here — the whole point of this
-//     class is to show what happens WITHOUT memoization
-//   - resetMetrics() must be called before each new getBestMove()
-//     or the node counts will accumulate across runs
-//   - The depth parameter limits how deep minimax searches —
-//     without it the solver would run until a terminal state
+//   - Do NOT add any caching here — the whole point of this class
+//     is to show what happens WITHOUT memoization
+//   - resetMetrics() must be called before each getBestMove() or
+//     node counts will accumulate across benchmark runs
 // ============================================================
 
 #pragma once
 #include "ISolver.h"
 #include "GameState.h"
 #include "Metrics.h"
+#include <string>
 
 class BruteForceSolver : public ISolver {
 public:
-    // ----------------------------------------------------------
-    // Constructor
-    // depth = maximum search depth for minimax.
-    // Lower depth = faster but less optimal play.
-    // Higher depth = more accurate but exponentially slower.
-    // ----------------------------------------------------------
-    BruteForceSolver(int depth);
+    BruteForceSolver() = default;
+    ~BruteForceSolver() override = default;
 
     // ----------------------------------------------------------
     // getBestMove(state)
-    // Runs minimax from the current game state and returns
-    // the best move for whoever's turn it is.
-    // Also records time taken in metrics.timeMs.
+    // Entry point. Iterates over all legal moves, runs minimax
+    // for each, and returns the Move with the best score.
+    // X (Maximizer) picks the highest score.
+    // O (Minimizer) picks the lowest score.
+    // Also records elapsed time in metrics.timeMs.
     // ----------------------------------------------------------
     Move getBestMove(GameState& state) override;
 
-    // Returns metrics collected during the last getBestMove() call
+    // Returns metrics from the last getBestMove() call.
     Metrics getMetrics() const override;
 
-    // Resets all metric counters to zero — call before each run
+    // Resets nodesExplored, timeMs, cacheHits to zero.
+    // Call this before every benchmark run.
     void resetMetrics() override;
 
+    std::string name() const override { return "BruteForce"; }
+
 private:
-    int maxDepth;      // Depth limit for minimax search
-    Metrics metrics;   // Tracks nodes explored and time
+    Metrics metrics;   // Filled in during each getBestMove() call
 
     // ----------------------------------------------------------
     // minimax(state, depth, isMaximizing)
-    // The core recursive function.
-    // isMaximizing = true when it's X's turn (wants highest score)
-    // isMaximizing = false when it's O's turn (wants lowest score)
+    // Core recursive function.
+    // isMaximizing = true  → X's turn (maximise)
+    // isMaximizing = false → O's turn (minimise)
     // Increments metrics.nodesExplored on every call.
+    // Uses board.placeMark / board.undoMark for backtracking —
+    // no GameState copying, mutates and restores in place.
     // ----------------------------------------------------------
     int minimax(GameState& state, int depth, bool isMaximizing);
 };
