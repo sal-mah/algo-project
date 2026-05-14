@@ -78,6 +78,9 @@ public:
     // Resets all metric counters AND clears the cache.
     // Must be called before each benchmark run.
     void resetMetrics() override;
+    
+    std::string name() const override { return "DP"; }
+    
 
 private:
     int maxDepth;      // Depth limit for minimax search
