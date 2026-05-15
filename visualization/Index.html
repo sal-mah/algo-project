@@ -140,6 +140,8 @@
       padding: 24px;
     }
     .card + .card { margin-top: 24px; }
+    /* grid siblings must NOT inherit the sibling margin — fixes DP card misalignment */
+    .board-pair .card + .card { margin-top: 0; }
 
     /* ── Two-column split ──────────────────────────────────────────────────── */
     .split {
@@ -188,7 +190,7 @@
     button.primary:hover { opacity: 0.88; }
 
     /* ── Board area ────────────────────────────────────────────────────────── */
-    #board-container { min-height: 260px; }
+    #board-container, .board-container { min-height: 260px; }
 
     /* Cell hover hint visibility */
     .ttt-hint { opacity: 0; transition: opacity 0.15s; }
@@ -196,13 +198,13 @@
     .ttt-cell-hover:hover { background: var(--surface2) !important; }
 
     /* ── Status + metrics ──────────────────────────────────────────────────── */
-    #ttt-status {
+    #ttt-status, .ttt-status {
       font-size: 18px;
       font-weight: 600;
       margin-bottom: 8px;
       min-height: 28px;
     }
-    #ttt-metrics {
+    #ttt-metrics, .ttt-metrics {
       font-size: 12px;
       color: var(--text2);
       min-height: 20px;
@@ -265,6 +267,103 @@
     #benchmark-table th { text-align: left; font-weight: 500; color: var(--text2); font-size: 12px; }
     #benchmark-table tr:hover td { background: var(--surface2); }
 
+    /* ── Trace table (per-board move log) ──────────────────────────────────── */
+    .trace-kpi {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .trace-kpi-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+    .trace-kpi-value { font-size: 17px; font-weight: 700; }
+    .trace-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .trace-table th {
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text3);
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border2);
+      text-align: left;
+    }
+    .trace-table td {
+      padding: 5px 8px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .trace-table tbody tr:hover td { background: var(--surface2); }
+
+    /* ── Summary comparison bar ─────────────────────────────────────────────── */
+    .summary-bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border2);
+      margin-top: 24px;
+    }
+    .summary-bf {
+      background: rgba(176,0,32,0.06);
+      padding: 18px 20px;
+      border-right: 1px solid var(--border2);
+    }
+    .summary-dp {
+      background: rgba(29,158,117,0.06);
+      padding: 18px 20px;
+      border-left: 1px solid var(--border2);
+    }
+    .summary-mid {
+      background: var(--surface2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 18px;
+      gap: 6px;
+      min-width: 130px;
+    }
+    .summary-alg-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .summary-stat { font-size: 12px; color: var(--text2); line-height: 1.8; }
+    .summary-stat strong { font-variant-numeric: tabular-nums; }
+    .summary-verdict {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      text-align: center;
+    }
+    .summary-sub {
+      font-size: 11px;
+      color: var(--text3);
+      text-align: center;
+    }
+
+    /* ── Board pair layout ──────────────────────────────────────────────────── */
+    .board-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 780px) { .board-pair { grid-template-columns: 1fr; } }
+    .board-card-bf { border-color: rgba(176,0,32,0.3) !important; }
+    .board-card-dp { border-color: rgba(29,158,117,0.35) !important; }
+
     /* ── Tabs ───────────────────────────────────────────────────────────────── */
     .tabs {
       display: flex;
@@ -291,6 +390,32 @@
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
+
+    /* ── Live demo mode switcher ───────────────────────────────────────────── */
+    .mode-switch {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .mode-btn {
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface2);
+      color: var(--text2);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .mode-panel { display: none; }
+    .mode-panel.active { display: block; }
 
     /* ── Money result callout ──────────────────────────────────────────────── */
     .callout {
@@ -342,7 +467,14 @@
 
   <!-- ═══ TAB 1 — LIVE DEMO ═══════════════════════════════════════════════ -->
   <div id="tab-demo" class="tab-panel active">
-    <div class="split">
+    <div class="mode-switch">
+      <button class="mode-btn active" onclick="showLiveMode('ai-ai', this)">AI vs AI (BF vs DP)</button>
+      <button class="mode-btn" onclick="showLiveMode('human-ai', this)">Human vs AI</button>
+      <button class="mode-btn" onclick="showLiveMode('human-human', this)">Human vs Human</button>
+    </div>
+
+    <div id="mode-human-ai" class="mode-panel">
+      <div class="split">
 
       <!-- Left: board -->
       <div class="card">
@@ -423,6 +555,142 @@
         </div>
       </div>
 
+      </div>
+    </div>
+
+    <div id="mode-ai-ai" class="mode-panel active">
+
+      <!-- ── Header ── -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+        <div>
+          <div class="section-title" style="margin-bottom:4px">AI vs AI — Brute Force vs DP (C++ Trace Playback)</div>
+          <p style="font-size:13px;color:var(--text2);max-width:680px">
+            The games below are <strong>not</strong> simulated in JavaScript. Instead, the UI is reading 
+            <code style="font-size:11px;background:var(--border);padding:1px 6px;border-radius:4px">results/game_trace.csv</code>,
+            which was generated by the C++ engine. This ensures the move sequences, 
+            node counts, and cache hits perfectly match the C++ backend.
+          </p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="BoardController.reset('ai-bf-board')">↺ Restart BF</button>
+          <button onclick="BoardController.reset('ai-dp-board')">↺ Restart DP</button>
+        </div>
+      </div>
+
+      <!-- ── Shared Configuration ── -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="section-title" style="margin-bottom:14px">Playback Controls</div>
+        <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center">
+
+          <div class="ctrl-row">
+            <span class="ctrl-label">Board size (N)</span>
+            <select id="ai-sel-n" onchange="applyAiAiConfig()" aria-label="Board size (AI vs AI)">
+              <option value="3" selected>3 × 3</option>
+              <option value="4">4 × 4</option>
+              <option value="5">5 × 5</option>
+            </select>
+          </div>
+
+
+
+          <div class="ctrl-row">
+            <span class="ctrl-label">Max Depth</span>
+            <select id="ai-sel-depth" onchange="applyAiAiConfig()" aria-label="Max depth (AI vs AI)">
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8" selected>8</option>
+            </select>
+          </div>
+
+          <div class="ctrl-row" style="margin:0">
+            <span class="ctrl-label">Playback speed</span>
+            <select id="ai-sel-speed" onchange="applyAiAiConfig()" aria-label="Auto-play speed">
+              <option value="100">Fast (100 ms)</option>
+              <option value="200" selected>Normal (200 ms)</option>
+              <option value="400">Slow (400 ms)</option>
+              <option value="700">Very slow (700 ms)</option>
+            </select>
+          </div>
+
+          <div class="ctrl-row" style="margin:0">
+            <button class="primary" onclick="BoardController.reset('ai-bf-board');BoardController.reset('ai-dp-board')">↺ Restart Playback</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Two boards side by side ── -->
+      <div class="board-pair">
+
+        <!-- LEFT: Brute Force board -->
+        <div class="card board-card-bf">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <span class="badge badge-bf">Brute Force</span>
+            <span style="font-size:12px;color:var(--text2)">O(b<sup>d</sup>) — no cache</span>
+          </div>
+          <div id="ai-bf-status" class="ttt-status" style="font-size:16px">X thinking…</div>
+          <div id="ai-bf-metrics" class="ttt-metrics" style="margin-bottom:12px">Auto-playing…</div>
+          <div id="ai-bf-board" class="board-container"></div>
+
+          <!-- BF trace table -->
+          <div style="margin-top:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Move Trace</div>
+            <div id="ai-bf-trace"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: DP board -->
+        <div class="card board-card-dp">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <span class="badge badge-dp">DP Memoized</span>
+            <span style="font-size:12px;color:var(--text2)">O(U·b) — with cache</span>
+          </div>
+          <div id="ai-dp-status" class="ttt-status" style="font-size:16px">X thinking…</div>
+          <div id="ai-dp-metrics" class="ttt-metrics" style="margin-bottom:12px">Auto-playing…</div>
+          <div id="ai-dp-board" class="board-container"></div>
+
+          <!-- DP trace table -->
+          <div style="margin-top:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Move Trace</div>
+            <div id="ai-dp-trace"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Live summary comparison bar ── -->
+      <div class="summary-bar" id="ai-summary-bar">
+        <div class="summary-bf">
+          <div class="summary-alg-label" style="color:var(--danger)">⬡ Brute Force</div>
+          <div class="summary-stat">Nodes: <strong id="sum-bf-nodes">—</strong></div>
+          <div class="summary-stat">Time: <strong id="sum-bf-time">—</strong></div>
+          <div class="summary-stat">Cache hits: <strong style="color:var(--text3)">none</strong></div>
+        </div>
+        <div class="summary-mid">
+          <div class="summary-verdict" id="sum-verdict">—</div>
+          <div class="summary-sub" id="sum-sub">waiting for moves…</div>
+        </div>
+        <div class="summary-dp">
+          <div class="summary-alg-label" style="color:#1d9e75">⬡ DP Memoized</div>
+          <div class="summary-stat">Nodes: <strong id="sum-dp-nodes">—</strong></div>
+          <div class="summary-stat">Time: <strong id="sum-dp-time">—</strong></div>
+          <div class="summary-stat">Cache hits: <strong id="sum-dp-hits" style="color:#1d9e75">—</strong></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="mode-human-human" class="mode-panel">
+      <div class="section-title">Human vs Human (no AI)</div>
+      <div class="card">
+        <div id="human-status" class="ttt-status">Player X turn</div>
+        <div id="human-metrics" class="ttt-metrics">No AI metrics (human vs human)</div>
+        <div id="human-board" class="board-container"></div>
+        <div style="margin-top:8px">
+          <button onclick="BoardController.reset('human-board')">New game</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -578,6 +846,23 @@
     }
   }
 
+  function showLiveMode(mode, el) {
+    document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('mode-' + mode);
+    if (panel) panel.classList.add('active');
+    if (el) el.classList.add('active');
+
+    if (mode === 'ai-ai') {
+      BoardController.reset('ai-bf-board');
+      BoardController.reset('ai-dp-board');
+    } else if (mode === 'human-human') {
+      BoardController.reset('human-board');
+    } else {
+      BoardController.reset('board-container');
+    }
+  }
+
   // ── Config → board ─────────────────────────────────────────────────────────
   function applyConfig() {
     const N = parseInt(document.getElementById('sel-n').value);
@@ -612,11 +897,119 @@
 
   // ── Init ───────────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
-    BoardController.init('board-container', { N:3, K:3, humanPlayer:'X', aiSolver:'dp', maxDepth:-1 });
+    BoardController.init('board-container', {
+      N:3, K:3, humanPlayer:'X', aiSolver:'dp', maxDepth:-1,
+      statusId:'ttt-status', metricsId:'ttt-metrics'
+    });
 
-    // Load charts immediately in background (CSV may or may not be there)
+    BoardController.init('ai-bf-board', {
+      N:3, K:3, aiSolver:'bf', maxDepth:5, mode:'ai-vs-ai', autoDelay:200,
+      statusId:'ai-bf-status', metricsId:'ai-bf-metrics', tableId:'ai-bf-trace'
+    });
+
+    BoardController.init('ai-dp-board', {
+      N:3, K:3, aiSolver:'dp', maxDepth:5, mode:'ai-vs-ai', autoDelay:200,
+      statusId:'ai-dp-status', metricsId:'ai-dp-metrics', tableId:'ai-dp-trace'
+    });
+
+    // ── Live summary bar updater ──────────────────────────────────────────────
+    function updateSummaryBar() {
+      const bf = BoardController.getTotals('ai-bf-board');
+      const dp = BoardController.getTotals('ai-dp-board');
+      if (!bf || !dp) return;
+
+      document.getElementById('sum-bf-nodes').textContent = bf.nodes.toLocaleString();
+      document.getElementById('sum-bf-time').textContent  = bf.timeMs.toFixed(1) + ' ms';
+      document.getElementById('sum-dp-nodes').textContent = dp.nodes.toLocaleString();
+      document.getElementById('sum-dp-time').textContent  = dp.timeMs.toFixed(1) + ' ms';
+
+      const totalHits = dp.cacheHits;
+      const hitRate   = dp.nodes > 0 ? Math.round((totalHits / dp.nodes) * 100) : 0;
+      document.getElementById('sum-dp-hits').textContent = totalHits.toLocaleString() + ' (' + hitRate + '%)';
+
+      if (bf.nodes > 0 && dp.nodes > 0) {
+        const speedup  = (bf.timeMs / Math.max(dp.timeMs, 0.01)).toFixed(1);
+        const nodeSave = Math.round((1 - dp.nodes / bf.nodes) * 100);
+        document.getElementById('sum-verdict').textContent = 'DP is ' + speedup + '× faster';
+        document.getElementById('sum-sub').textContent     = 'DP saved ' + nodeSave + '% of nodes explored';
+      }
+    }
+    window._onBoardMoveLogged = updateSummaryBar;
+
+    function applyAiAiConfig() {
+      const N     = parseInt(document.getElementById('ai-sel-n').value);
+      const delay = parseInt(document.getElementById('ai-sel-speed').value);
+
+      // K always equals N (C++ traces use N=K)
+      const clampedK = N;
+
+      // Disable depth options not available for the selected N
+      // Matches C++ timeout rules: BF 4x4 depth>=8 timeout, 5x5 depth>=6 timeout
+      // DP 5x5 depth>=8 timeout — but the trace only has what BF *can* play
+      // Simplest: disable depths where BOTH BF and DP are timeouts for this N
+      const selDepth = document.getElementById('ai-sel-depth');
+      for (let opt of selDepth.options) {
+        const d = parseInt(opt.value);
+        if (N === 3) opt.disabled = false;
+        else if (N === 4) opt.disabled = (d >= 8); // BF times out at 8; trace stops there
+        else if (N === 5) opt.disabled = (d >= 6); // BF times out at 6
+      }
+      // Snap to highest allowed depth if current selection is disabled
+      let depth = parseInt(selDepth.value);
+      if (selDepth.options[selDepth.selectedIndex].disabled) {
+        for (let i = selDepth.options.length - 1; i >= 0; i--) {
+          if (!selDepth.options[i].disabled) {
+            selDepth.selectedIndex = i;
+            depth = parseInt(selDepth.options[i].value);
+            break;
+          }
+        }
+      }
+
+      const cfg = { N, K: clampedK, maxDepth: depth, autoDelay: delay };
+      BoardController.setConfig('ai-bf-board', cfg);
+      BoardController.setConfig('ai-dp-board', cfg);
+
+      // Reset summary bar
+      ['sum-bf-nodes','sum-bf-time','sum-dp-nodes','sum-dp-time','sum-dp-hits'].forEach(id => {
+        document.getElementById(id).textContent = '—';
+      });
+      document.getElementById('sum-verdict').textContent = '—';
+      document.getElementById('sum-sub').textContent = 'waiting for moves…';
+    }
+    window.applyAiAiConfig = applyAiAiConfig;
+
+    BoardController.init('human-board', {
+      N:3, K:3, mode:'human-vs-human',
+      statusId:'human-status', metricsId:'human-metrics'
+    });
+
+    // Load charts immediately in background
     ChartsController.initFromFile('tab-charts', '../results/data.csv');
     window._chartsLoaded = true;
+
+    // Load AI trace data for playback
+    (async function loadGameTrace() {
+      try {
+        const resp = await fetch('../results/game_trace.csv');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const text = await resp.text();
+        const rows = text.trim().split('\n').slice(1).map(line => {
+          const p = line.split(',');
+          // solver,n,k,maxDepth,moveNum,player,row,col,nodes,timeMs,cacheHits
+          return {
+            solver: p[0], n: parseInt(p[1]), k: parseInt(p[2]), maxDepth: parseInt(p[3]),
+            moveNum: parseInt(p[4]), player: p[5], row: parseInt(p[6]), col: parseInt(p[7]),
+            nodes: parseInt(p[8]), timeMs: parseFloat(p[9]), cacheHits: parseInt(p[10])
+          };
+        });
+        window._aiGameTrace = rows;
+        console.log("Loaded game trace:", rows.length, "moves");
+      } catch (e) {
+        console.warn("Could not load game_trace.csv. Run C++ benchmark first.");
+        window._aiGameTrace = [];
+      }
+    })();
   });
 </script>
 </body>

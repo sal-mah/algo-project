@@ -6,7 +6,7 @@ using namespace std;
 GameState::GameState(int n, int k)   // n is boardSize / k is winLength
     : board(n, k), currentPlayer(Cell::X) {}
 
-    
+
 // Returns whether the game has reached a terminal state (the game is finished).
 bool GameState::isTerminal() const {
     return board.checkWin(Cell::X) || board.checkWin(Cell::O) || board.isFull();

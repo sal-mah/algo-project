@@ -74,20 +74,20 @@ int BruteForceSolver::minimax(GameState& state, int depth, bool isMaximizing) {
     if (isMaximizing) {
         int best = std::numeric_limits<int>::min();
 
-        for (const Move& m : moves) {
+        for (const Move& m : moves) { 
             board.placeMark(m.row, m.col, currentCell);  // apply
             state.switchPlayer();                         // flip turn
 
             int score = minimax(state, depth - 1, false);
 
-            state.switchPlayer();                         // restore turn
-            board.undoMark(m.row, m.col);                // undo
+            state.switchPlayer();                         // undo the turn switch   <- BACKTRACK
+            board.undoMark(m.row, m.col);                // undo the move           <- BACKTRACK  
 
             if (score > best) best = score;
         }
         return best;
 
-    } else {
+    } else { // Minimizing player
         int best = std::numeric_limits<int>::max();
 
         for (const Move& m : moves) {
@@ -96,8 +96,8 @@ int BruteForceSolver::minimax(GameState& state, int depth, bool isMaximizing) {
 
             int score = minimax(state, depth - 1, true);
 
-            state.switchPlayer();                         // restore turn
-            board.undoMark(m.row, m.col);                // undo
+            state.switchPlayer();                         // undo the turn switch   <- BACKTRACK
+            board.undoMark(m.row, m.col);                // undo the move           <- BACKTRACK  
 
             if (score < best) best = score;
         }

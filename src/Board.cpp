@@ -99,13 +99,16 @@ string Board::getKey() const {
                 case Cell::X:
                     key.push_back('X');
                     break;
+
                 case Cell::O:
                     key.push_back('O');
                     break;
+                    
                 case Cell::EMPTY:
                 default:
                     key.push_back('_');
                     break;
+                    
             }
         }
     }

@@ -267,60 +267,89 @@
     buildSummaryTable(rows, containerId);
   }
 
+  function buildSolverTable(rows, solverKey, accentColor, isBF) {
+    const boards = [...new Set(rows.map(r => r.board))].sort((a,b) => a - b);
+    let html = '';
+
+    for (const N of boards) {
+      const group = rows.filter(r => r.solver === solverKey && r.board === N)
+                        .sort((a,b) => a.depth - b.depth);
+      if (!group.length) continue;
+
+      html += `<div style="margin-bottom:22px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;
+             color:${accentColor};margin-bottom:8px;padding-bottom:5px;
+             border-bottom:2px solid ${accentColor === 'var(--color-text-danger)' ? 'rgba(176,0,32,0.2)' : 'rgba(29,158,117,0.2)'}">
+          Board ${N}×${N}
+        </div>
+        <table class="trace-table" style="width:100%;text-align:left;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="border-bottom:1px solid var(--color-border-tertiary)">
+              <th style="padding:6px 0;font-weight:500;color:var(--text2)">Depth</th>
+              <th style="padding:6px 0;text-align:right;font-weight:500;color:var(--text2)">Nodes</th>
+              <th style="padding:6px 0;text-align:right;font-weight:500;color:var(--text2)">Time (ms)</th>
+              ${isBF ? '<th style="padding:6px 0;text-align:center;color:var(--text3);font-weight:500">Cache</th>'
+                     : '<th style="padding:6px 0;text-align:right;color:#1d9e75;font-weight:500">Hits</th><th style="padding:6px 0;text-align:right;color:#1d9e75;font-weight:500">Hit %</th>'}
+            </tr>
+          </thead>
+          <tbody>`;
+
+      for (const r of group) {
+        const isTO   = r.nodes === 'TIMEOUT' || r.timeMs === 'TIMEOUT';
+        const isMoneyResult = N === 5 && r.depth === 8;
+        const bg = isMoneyResult ? 'background:var(--color-background-warning)' : '';
+        
+        const nodes  = isTO ? `<span style="color:var(--color-text-danger);font-weight:600">TIMEOUT</span>`
+                            : `<span style="font-weight:600;color:${accentColor}">${Number(r.nodes).toLocaleString()}</span>`;
+        const time   = isTO ? `<span style="color:var(--color-text-danger)">—</span>`
+                            : Number(r.timeMs).toFixed(1);
+        let cache = '';
+        if (isBF) {
+          cache = `<td style="padding:6px 0;color:var(--text3);font-size:11px;text-align:center">none</td>`;
+        } else if (isTO) {
+          cache = `<td colspan="2" style="padding:6px 0;color:var(--color-text-danger);text-align:center;font-size:11px">TIMEOUT</td>`;
+        } else {
+          const hits = Number(r.cacheHits), n = Number(r.nodes);
+          const pct  = n > 0 ? Math.round((hits / n) * 100) : 0;
+          cache = `<td style="padding:6px 0;color:#1d9e75;font-variant-numeric:tabular-nums;text-align:right">${hits.toLocaleString()}</td>
+                   <td style="padding:6px 0;color:#1d9e75;font-variant-numeric:tabular-nums;text-align:right">${pct}%</td>`;
+        }
+        html += `<tr style="${bg};border-bottom:1px solid var(--color-border-tertiary)">
+          <td style="padding:6px 0;text-align:center;font-weight:600">${r.depth}</td>
+          <td style="padding:6px 0;font-variant-numeric:tabular-nums;text-align:right">${nodes}</td>
+          <td style="padding:6px 0;font-variant-numeric:tabular-nums;text-align:right">${time}</td>
+          ${cache}
+        </tr>`;
+      }
+      html += `</tbody></table></div>`;
+    }
+    return html || `<p style="color:var(--text3);font-size:13px">No data for this solver.</p>`;
+  }
+
   function buildSummaryTable(rows, containerId) {
     const tableEl = document.getElementById('benchmark-table');
     if (!tableEl) return;
 
-    const sorted = [...rows].sort((a,b) => {
-      if (a.solver !== b.solver) return a.solver.localeCompare(b.solver);
-      if (a.board !== b.board) return a.board - b.board;
-      return a.depth - b.depth;
-    });
+    let html = `
+      <div class="board-pair">
+        <div class="card board-card-bf">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span class="badge badge-bf">Brute Force</span>
+            <span style="font-size:12px;color:var(--text2)">O(b<sup>d</sup>) — no memoization</span>
+          </div>
+          ${buildSolverTable(rows, 'BruteForce', 'var(--color-text-danger)', true)}
+        </div>
+        
+        <div class="card board-card-dp">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span class="badge badge-dp">DP Memoized</span>
+            <span style="font-size:12px;color:var(--text2)">O(U·b) — transposition table</span>
+          </div>
+          ${buildSolverTable(rows, 'DP', '#1d9e75', false)}
+        </div>
+      </div>
+    `;
 
-    let html = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
-      <thead>
-        <tr style="border-bottom:1px solid var(--color-border-tertiary)">
-          <th style="text-align:left;padding:8px 10px;font-weight:500;color:var(--color-text-secondary)">Solver</th>
-          <th style="text-align:center;padding:8px 10px;font-weight:500;color:var(--color-text-secondary)">Board</th>
-          <th style="text-align:center;padding:8px 10px;font-weight:500;color:var(--color-text-secondary)">Depth</th>
-          <th style="text-align:right;padding:8px 10px;font-weight:500;color:var(--color-text-secondary)">Nodes</th>
-          <th style="text-align:right;padding:8px 10px;font-weight:500;color:var(--color-text-secondary)">Time (ms)</th>
-          <th style="text-align:right;padding:8px 10px;font-weight:500;color:var(--color-text-secondary)">Cache hits</th>
-        </tr>
-      </thead><tbody>`;
-
-    sorted.forEach((r, i) => {
-      const isTimeout = r.nodes === 'TIMEOUT' || r.timeMs === 'TIMEOUT';
-      const isMoneyResult = r.board === 5 && r.depth === 8;
-      const bg = isMoneyResult ? 'background:var(--color-background-warning);' : (i%2===0 ? '' : 'background:var(--color-background-secondary);');
-      const timeoutStyle = isTimeout ? 'color:var(--color-text-danger);font-weight:500;' : '';
-      const nodesStr = r.nodes === 'TIMEOUT' ? 'TIMEOUT' : Number(r.nodes).toLocaleString();
-      const timeStr  = r.timeMs === 'TIMEOUT' ? 'TIMEOUT' : Number(r.timeMs).toFixed(1);
-      const hitsStr  = r.cacheHits === 'TIMEOUT' || r.cacheHits === 0 ? (r.solver === 'DP' ? '0' : '—') : Number(r.cacheHits).toLocaleString();
-
-      // Hit rate % for DP
-      let hitRate = '';
-      if (r.solver === 'DP' && r.nodes !== 'TIMEOUT' && r.nodes > 0) {
-        hitRate = ` <span style="color:var(--color-text-secondary);font-size:11px">(${Math.round((r.cacheHits/r.nodes)*100)}%)</span>`;
-      }
-
-      html += `<tr style="${bg}border-bottom:0.5px solid var(--color-border-tertiary)">
-        <td style="padding:7px 10px">
-          <span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;
-            background:${r.solver==='DP' ? 'var(--color-background-info)' : 'var(--color-background-danger)'};
-            color:${r.solver==='DP' ? 'var(--color-text-info)' : 'var(--color-text-danger)'}">
-            ${r.solver}
-          </span>
-        </td>
-        <td style="text-align:center;padding:7px 10px">${r.board}×${r.board}</td>
-        <td style="text-align:center;padding:7px 10px">${r.depth}</td>
-        <td style="text-align:right;padding:7px 10px;${timeoutStyle}">${nodesStr}</td>
-        <td style="text-align:right;padding:7px 10px;${timeoutStyle}">${timeStr}</td>
-        <td style="text-align:right;padding:7px 10px">${hitsStr}${hitRate}</td>
-      </tr>`;
-    });
-
-    html += `</tbody></table>`;
     tableEl.innerHTML = html;
   }
 
