@@ -69,15 +69,15 @@ memoized Minimax using dynamic programming (DP). Both approaches are
 implemented in C++, their structures are described, their computational
 complexities are analyzed, and their performance is evaluated empirically
 across board sizes $N \in \{3, 4, 5\}$ and search depths
-$d \in \{2, 4, 6, 8\}$. The brute-force solver, which explores all
-possible game states without memory, proves tractable only for small
-configurations ($N=3$, $d\le 4$) and times out on larger instances due
-to $O(b^d)$ exponential growth. In contrast, the DP memoized solver
-leverages a transposition table that caches repeated board states,
-achieving cache hit rates of up to 74\% and completing all
-configurations up to $N=5$, $d=6$. We analyze each method's
-implementation, complexity, and the cache hit rate as the key metric
-explaining their divergent scalability.
+$d \in \{2, 4, 6, 8\}$. The benchmark plays a full game per configuration
+and sums metrics across all moves. The brute-force solver, which explores
+all possible game states without memory, is skipped at $4\times4, d=8$
+and $5\times5$ with $d\ge 6$ under our timeout rules, while the DP
+memoized solver completes all configurations up to $5\times5, d=6$ and
+is skipped only at $5\times5, d=8$. The DP solver achieves cache hit
+rates up to 73.6\%. We analyze each method's implementation, complexity,
+and the cache hit rate as the key metric explaining their divergent
+scalability.
 \end{abstract}
 
 % ─────────────────────────────────────────────────────────────────
@@ -139,11 +139,11 @@ hit rate.
 The main contributions of this paper are:
 \begin{itemize}
     \item A side-by-side implementation of brute-force and DP memoized
-          Minimax for the generalized Tic-Tac-Toe problem.
+        Minimax for the generalized Tic-Tac-Toe problem.
     \item An empirical evaluation quantifying the scalability gap,
-          including cache hit rates up to 74\%.
+        including cache hit rates up to 73.6\%.
     \item A detailed complexity analysis explaining why memoization
-          dramatically reduces the effective search space.
+        dramatically reduces the effective search space.
 \end{itemize}
 
 % ─────────────────────────────────────────────────────────────────
@@ -203,8 +203,10 @@ All experiments run on a 3.0 GHz CPU with 16 GB RAM, compiled with
     \item Search depths: $d \in \{2, 4, 6, 8\}$
     \item Win length $K = N$ (standard Tic-Tac-Toe)
 \end{itemize}
-Each configuration is executed once per solver; a timeout of 30 seconds
-is enforced.
+Each configuration plays a full game; at each ply the solver is called,
+its metrics are reset, and results are summed across the game. Timeouts
+are rule-based: brute force is skipped for $4\times4, d\ge 8$ and
+$5\times5, d\ge 6$, while DP is skipped for $5\times5, d\ge 8$.
 
 % ─────────────────────────────────────────────────────────────────
 \subsection{Brute-Force Minimax Solver}
@@ -545,7 +547,7 @@ configurations reachable from the initial state within depth $d$. Each
 unique state is computed at most once per depth level, performing $O(b)$
 work per state. Total complexity is therefore $O(U \cdot b)$, where
 $U \ll b^d$ because many distinct move sequences converge to the same
-configuration. In practice, cache hit rates of 49--74\% are observed
+configuration. In practice, cache hit rates of 49--73.6\% are observed
 (Table~\ref{tab:cachehit}), confirming that the majority of recursive
 calls are served from cache at sufficient depth.
 
@@ -617,13 +619,13 @@ Cache & None & \texttt{unordered\_map} \\
 \hline
 Repeated State & Full recomputation & $O(1)$ lookup \\
 \hline
-Configs Completed & 2 of 12 & 10 of 12 \\
+Configs Completed & 9 of 12 & 11 of 12 \\
 \hline
 \end{tabular}
 \end{table}
 
 Table~\ref{tab:cachehit} reports the DP solver’s cache hit rates. The
-hit rate grows from 0\% at $d=2$ to over 74\% at $d=8$, illustrating
+hit rate grows from 0\% at $d=2$ to 73.6\% at $4\times4, d=8$, illustrating
 the increasing density of transpositions deeper in the tree.
 
 \begin{table}[htbp]
@@ -636,43 +638,52 @@ the increasing density of transpositions deeper in the tree.
 \textbf{Board} & \textbf{Depth} & \textbf{Nodes} &
 \textbf{Cache Hits} & \textbf{Hit Rate} \\
 \hline
-$3{\times}3$ & 2 &        81 &         0 & 0.0\% \\
+$3{\times}3$ & 2 &       276 &         0 & 0.0\% \\
 \hline
-$3{\times}3$ & 4 &     2,097 &     1,008 & 48.1\% \\
+$3{\times}3$ & 4 &     4,481 &     2,094 & 46.7\% \\
 \hline
-$3{\times}3$ & 6 &    10,437 &     6,568 & 62.9\% \\
+$3{\times}3$ & 6 &    16,449 &     9,968 & 60.6\% \\
 \hline
-$3{\times}3$ & 8 &    15,945 &    10,546 & 66.1\% \\
+$3{\times}3$ & 8 &    22,690 &    14,455 & 63.7\% \\
 \hline
-$4{\times}4$ & 4 &    25,456 &    12,600 & 49.5\% \\
+$4{\times}4$ & 2 &     1,496 &         0 & 0.0\% \\
 \hline
-$4{\times}4$ & 6 &   636,976 &   420,280 & 66.0\% \\
+$4{\times}4$ & 4 &    89,734 &    44,093 & 49.1\% \\
 \hline
-$4{\times}4$ & 8 & 5,822,376 & 4,309,330 & 74.0\% \\
+$4{\times}4$ & 6 & 1,620,848 & 1,064,327 & 65.7\% \\
 \hline
-$5{\times}5$ & 4 &   166,225 &    82,800 & 49.8\% \\
+$4{\times}4$ & 8 & 11,707,893 & 8,621,896 & 73.6\% \\
 \hline
-$5{\times}5$ & 6 & 12,386,125 & 8,229,400 & 66.5\% \\
+$5{\times}5$ & 2 &     5,525 &         0 & 0.0\% \\
+\hline
+$5{\times}5$ & 4 &   884,190 &   439,280 & 49.7\% \\
+\hline
+$5{\times}5$ & 6 & 47,247,018 & 31,346,686 & 66.4\% \\
 \hline
 \end{tabular}
 \end{table}
 
-At $N = 3$, $d = 4$---the only configuration both solvers complete---
-brute force explores 3,609 nodes versus 2,097 for DP, a reduction of
-$1.72{\times}$. At $d = 6$, brute force times out while DP completes
-in 9.40\,ms with 10,437 nodes. At $N = 4$, $d = 8$, DP explores
-5,822,376 nodes with a 74\% hit rate, completing in 4,513\,ms.
+At $N = 3$, $d = 8$, both solvers complete: brute force explores
+490,303 nodes in 407.06\,ms, while DP explores 22,690 nodes in
+24.97\,ms, a $21.6{\times}$ node reduction. At $N = 4$, $d = 6$, brute
+force explores 15,577,978 nodes in 7,291.3\,ms, while DP explores
+1,620,848 nodes in 1,142.19\,ms with a 65.7\% hit rate. At $N = 4$,
+$d = 8$, DP explores 11,707,893 nodes with a 73.6\% hit rate and
+finishes in 9,518.55\,ms, while brute force is skipped by the timeout
+rule. At $N = 5$, $d = 6$, DP completes in 55,221.8\,ms with 66.4\%
+cache hits, while brute force is skipped.
 
 \subsection{Strengths and Limitations}
 \textbf{Brute Force Approach:}
 \textit{Strengths:} conceptually simple, minimal memory ($O(d)$), no
 cache concerns.
 \textit{Limitations:} exponential time; recomputes every transposed
-position; intractable beyond $N=3, d=4$.
+position; skipped by timeout rules at $4\times4, d\ge 8$ and
+$5\times5, d\ge 6$.
 
 \textbf{DP Memoized Approach:}
 \textit{Strengths:} eliminates redundant subtree computation; cache hit
-rate grows with depth (up to 74\%); handles $N=5, d=6$.
+rate grows with depth (up to 73.6\%); handles $N=5, d=6$.
 \textit{Limitations:} memory grows as $O(U)$; string‑key overhead; no
 benefit at very shallow depths.
 
@@ -682,14 +693,15 @@ benefit at very shallow depths.
 \section{Discussion}
 
 The results clearly demonstrate that brute-force Minimax scales
-exponentially and becomes impractical beyond the smallest configurations,
-while the DP memoized solver handles significantly larger instances by
-reusing computations. The cache hit rate is the critical factor: at
-$d=2$ (0\% hits) both solvers behave similarly; as depth increases,
-the hit rate approaches 74\%, reducing the effective node count by a
-factor of $1/(1-\text{hit rate})$. For $N=4, d=8$, the memoized solver
-explores 5.8M nodes but avoids 4.3M recomputations, yielding a feasible
-search where brute force would exceed $b^d$ bounds.
+exponentially and becomes impractical beyond the largest configurations
+allowed by the timeout rules, while the DP memoized solver handles
+significantly larger instances by reusing computations. The cache hit
+rate is the critical factor: at $d=2$ (0\% hits) both solvers behave
+similarly; as depth increases, the hit rate reaches 73.6\%, reducing the
+effective node count by a factor of $1/(1-\text{hit rate})$. For
+$N=4, d=8$, the memoized solver explores 11.7M nodes but avoids
+8.6M recomputations, yielding a feasible search where brute force is
+skipped.
 
 The memoized approach does incur a string‑key overhead and uses
 substantial memory. Nevertheless, for any non‑trivial depth, the trade‑off
@@ -704,12 +716,12 @@ valuable as a pedagogic baseline and a correctness reference.
 This paper presented a direct comparison of brute-force and DP memoized
 Minimax algorithms for solving the generalized Tic‑Tac‑Toe problem.
 The DP solver exploits overlapping subproblems to achieve dramatic
-reductions in search space, completing 10 of 12 benchmark configurations
-that brute force could not. The cache hit rate, reaching 74\% at
-$d=8$, quantifies the benefit of memoization. The work underscores the
-importance of dynamic programming techniques in adversarial search and
-provides a clear, measurable case study suitable for AI education and
-algorithm design.
+reductions in search space, completing 11 of 12 benchmark configurations
+while brute force completes 9 of 12. The cache hit rate, reaching
+73.6\% at $d=8$, quantifies the benefit of memoization. The work
+underscores the importance of dynamic programming techniques in
+adversarial search and provides a clear, measurable case study suitable
+for AI education and algorithm design.
 
 % ─────────────────────────────────────────────────────────────────
 % 11. FUTURE WORK
