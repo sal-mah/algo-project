@@ -36,7 +36,7 @@
   // BF = coral/red family, DP = teal/blue family, per board size = line style
 
   const COLORS = {
-    BF: {
+    BruteForce: {
       3: { border: '#D85A30', bg: 'rgba(216,90,48,0.12)' },
       4: { border: '#993C1D', bg: 'rgba(153,60,29,0.12)' },
       5: { border: '#E24B4A', bg: 'rgba(226,75,74,0.12)' }
