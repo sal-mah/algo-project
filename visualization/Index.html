@@ -12,60 +12,60 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0f1117;
-      --surface:  #1a1d27;
-      --surface2: #22263a;
-      --border:   rgba(255,255,255,0.08);
-      --border2:  rgba(255,255,255,0.14);
-      --text:     #e8eaf0;
-      --text2:    #9096a8;
-      --text3:    #5a6070;
-      --accent:   #4f8ef7;
-      --accent2:  #1d9e75;
-      --danger:   #e05a5a;
-      --warn:     #f4a935;
+      --bg:       #ffffff;
+      --surface:  #ffffff;
+      --surface2: #f7f7f9;
+      --border:   rgba(176,0,32,0.16);
+      --border2:  rgba(176,0,32,0.28);
+      --text:     #1a1a1a;
+      --text2:    #5a5a5a;
+      --text3:    #8a8a8a;
+      --accent:   #b00020;
+      --accent2:  #7a0015;
+      --danger:   #b00020;
+      --warn:     #b87900;
       --radius:   10px;
       --radius-lg:16px;
 
       /* Compatibility tokens used by JS renderers */
       --color-background-secondary: var(--surface2);
-      --color-background-success: rgba(29,158,117,0.18);
-      --color-background-info: rgba(79,142,247,0.18);
-      --color-background-danger: rgba(224,90,90,0.16);
-      --color-background-warning: rgba(244,169,53,0.16);
+      --color-background-success: rgba(176,0,32,0.18);
+      --color-background-info: rgba(122,0,21,0.14);
+      --color-background-danger: rgba(176,0,32,0.16);
+      --color-background-warning: rgba(176,0,32,0.12);
       --color-border-tertiary: var(--border);
       --color-border-secondary: var(--border2);
       --color-border-primary: var(--border2);
-      --color-border-success: rgba(29,158,117,0.55);
-      --color-border-info: rgba(79,142,247,0.55);
+      --color-border-success: rgba(176,0,32,0.5);
+      --color-border-info: rgba(122,0,21,0.5);
       --color-text-primary: var(--text);
       --color-text-secondary: var(--text2);
-      --color-text-info: var(--accent);
+      --color-text-info: var(--accent2);
       --color-text-danger: var(--danger);
     }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --bg:      #f5f6fa;
-        --surface: #ffffff;
-        --surface2:#f0f2f8;
-        --border:  rgba(0,0,0,0.07);
-        --border2: rgba(0,0,0,0.13);
-        --text:    #1a1d27;
-        --text2:   #555b72;
-        --text3:   #999eb0;
-        --accent:  #1855c4;
-        --accent2: #0f6e56;
-        --danger:  #c03030;
-        --warn:    #b07800;
+        --bg:       #ffffff;
+        --surface:  #ffffff;
+        --surface2: #f7f7f9;
+        --border:   rgba(176,0,32,0.16);
+        --border2:  rgba(176,0,32,0.28);
+        --text:     #1a1a1a;
+        --text2:    #5a5a5a;
+        --text3:    #8a8a8a;
+        --accent:   #b00020;
+        --accent2:  #7a0015;
+        --danger:   #b00020;
+        --warn:     #b87900;
 
-        --color-background-success: rgba(15,110,86,0.16);
-        --color-background-info: rgba(24,85,196,0.14);
-        --color-background-danger: rgba(192,48,48,0.14);
-        --color-background-warning: rgba(176,120,0,0.16);
-        --color-border-success: rgba(15,110,86,0.5);
-        --color-border-info: rgba(24,85,196,0.45);
-        --color-text-info: var(--accent);
+        --color-background-success: rgba(176,0,32,0.18);
+        --color-background-info: rgba(122,0,21,0.14);
+        --color-background-danger: rgba(176,0,32,0.16);
+        --color-background-warning: rgba(176,0,32,0.12);
+        --color-border-success: rgba(176,0,32,0.5);
+        --color-border-info: rgba(122,0,21,0.5);
+        --color-text-info: var(--accent2);
         --color-text-danger: var(--danger);
       }
     }
@@ -98,6 +98,13 @@
       font-size: 13px;
       color: var(--text2);
       margin-top: 4px;
+    }
+    .logo {
+      height: 42px;
+      width: auto;
+      padding: 6px;
+      background: #000;
+      border-radius: 8px;
     }
     .badge {
       display: inline-block;
@@ -285,15 +292,15 @@
 
     /* ── Money result callout ──────────────────────────────────────────────── */
     .callout {
-      background: rgba(244,169,53,0.1);
-      border: 1px solid rgba(244,169,53,0.3);
+      background: rgba(176,0,32,0.08);
+      border: 1px solid rgba(176,0,32,0.2);
       border-radius: var(--radius);
       padding: 12px 16px;
       font-size: 13px;
       color: var(--text2);
       margin-top: 16px;
     }
-    .callout strong { color: var(--warn); }
+    .callout strong { color: var(--accent); }
 
     /* ── Footer ────────────────────────────────────────────────────────────── */
     footer {
@@ -310,6 +317,7 @@
 <body>
 
 <header>
+  <img class="logo" src="assets/MIU_30TH_B_Small.png" alt="MIU logo" />
   <div>
     <h1>Generalized Tic-Tac-Toe Solver</h1>
     <p>Minimax algorithm — Brute Force vs Dynamic Programming (Memoization)</p>
@@ -372,7 +380,6 @@
                 <option value="bf">Brute Force</option>
               </select>
             </div>
-
             <div class="ctrl-row">
               <span class="ctrl-label">Max depth</span>
               <select id="sel-depth" onchange="applyConfig()" aria-label="Max depth">

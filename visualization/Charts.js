@@ -37,14 +37,14 @@
 
   const COLORS = {
     BruteForce: {
-      3: { border: '#D85A30', bg: 'rgba(216,90,48,0.12)' },
-      4: { border: '#993C1D', bg: 'rgba(153,60,29,0.12)' },
-      5: { border: '#E24B4A', bg: 'rgba(226,75,74,0.12)' }
+      3: { border: '#C1121F', bg: 'rgba(193,18,31,0.12)' },
+      4: { border: '#9B0D18', bg: 'rgba(155,13,24,0.12)' },
+      5: { border: '#E01E37', bg: 'rgba(224,30,55,0.12)' }
     },
     DP: {
-      3: { border: '#1D9E75', bg: 'rgba(29,158,117,0.12)' },
-      4: { border: '#0F6E56', bg: 'rgba(15,110,86,0.12)' },
-      5: { border: '#378ADD', bg: 'rgba(55,138,221,0.12)' }
+      3: { border: '#7A0015', bg: 'rgba(122,0,21,0.12)' },
+      4: { border: '#5C0010', bg: 'rgba(92,0,16,0.12)' },
+      5: { border: '#A30E1B', bg: 'rgba(163,14,27,0.12)' }
     }
   };
 
