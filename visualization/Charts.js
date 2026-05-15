@@ -20,7 +20,7 @@
   // ── CSV parser ─────────────────────────────────────────────────────────────
 
   function parseCSV(text) {
-    const lines = text.trim().split('\n');
+    const lines = text.trim().split('\n').filter(l => l.trim().length > 0);
     const headers = lines[0].split(',').map(h => h.trim());
     return lines.slice(1).map(line => {
       const vals = line.split(',').map(v => v.trim());
@@ -104,8 +104,11 @@
       for (const N of boardSizes) {
         const filtered = rows.filter(r => r.solver === solver && r.board === N);
         filtered.sort((a,b) => a.depth - b.depth);
-        const depthLabels = filtered.map(r => r.depth);
-        const values = filtered.map(r => r[field] === 'TIMEOUT' ? null : r[field]);
+        const byDepth = new Map();
+        filtered.forEach(r => {
+          byDepth.set(r.depth, r[field] === 'TIMEOUT' ? null : r[field]);
+        });
+        const values = labels.map(d => byDepth.has(d) ? byDepth.get(d) : null);
 
         // Only add if there's at least one non-null value
         if (values.every(v => v === null)) continue;
@@ -123,8 +126,6 @@
           tension: 0.3,
           spanGaps: false
         });
-
-        if (!labels.length) labels.push(...depthLabels);
       }
     }
     return datasets;
@@ -137,11 +138,15 @@
     for (const N of boardSizes) {
       const filtered = rows.filter(r => r.solver === 'DP' && r.board === N && r.nodes !== 'TIMEOUT' && r.nodes > 0);
       filtered.sort((a,b) => a.depth - b.depth);
-
-      const values = filtered.map(r => {
-        if (r.cacheHits === 'TIMEOUT' || r.nodes === 'TIMEOUT') return null;
-        return Math.round((r.cacheHits / r.nodes) * 100);
+      const byDepth = new Map();
+      filtered.forEach(r => {
+        if (r.cacheHits === 'TIMEOUT' || r.nodes === 'TIMEOUT') {
+          byDepth.set(r.depth, null);
+        } else {
+          byDepth.set(r.depth, Math.round((r.cacheHits / r.nodes) * 100));
+        }
       });
+      const values = labels.map(d => byDepth.has(d) ? byDepth.get(d) : null);
 
       if (values.every(v => v === null)) continue;
 
@@ -155,11 +160,9 @@
         borderDash: DASH[N],
         pointRadius: 4,
         pointHoverRadius: 6,
-        tension: 0.3,
-        spanGaps: false
-      });
-
-      if (!labels.length) filtered.forEach(r => labels.push(r.depth));
+          tension: 0.3,
+          spanGaps: false
+        });
     }
     return datasets;
   }
@@ -171,9 +174,10 @@
     if (!container) return;
 
     const boardSizes = [3, 4, 5];
+    const depthLabels = [...new Set(rows.map(r => r.depth).filter(d => typeof d === 'number'))].sort((a,b) => a - b);
 
     // ── Chart 1: Nodes explored ────────────────────────────────────────────
-    const nodesLabels = [];
+    const nodesLabels = depthLabels.slice();
     const nodesDatasets = buildDatasets(rows, 'nodes', ['BruteForce','DP'], boardSizes, nodesLabels);
 
     const c1 = document.getElementById('chart-nodes');
@@ -198,7 +202,7 @@
     }
 
     // ── Chart 2: Time ──────────────────────────────────────────────────────
-    const timeLabels = [];
+    const timeLabels = depthLabels.slice();
     const timeDatasets = buildDatasets(rows, 'timeMs', ['BruteForce','DP'], boardSizes, timeLabels);
 
     const c2 = document.getElementById('chart-time');
@@ -223,7 +227,7 @@
     }
 
     // ── Chart 3: Cache hit rate ────────────────────────────────────────────
-    const hitLabels = [];
+    const hitLabels = depthLabels.slice();
     const hitDatasets = buildCacheDatasets(rows, boardSizes, hitLabels);
 
     const c3 = document.getElementById('chart-cache');
