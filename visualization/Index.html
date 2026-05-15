@@ -349,7 +349,7 @@
 
             <div class="ctrl-row">
               <span class="ctrl-label">Board size (N)</span>
-              <select id="sel-n" onchange="applyConfig()">
+              <select id="sel-n" onchange="applyConfig()" aria-label="Board size">
                 <option value="3" selected>3 × 3</option>
                 <option value="4">4 × 4</option>
                 <option value="5">5 × 5</option>
@@ -358,7 +358,7 @@
 
             <div class="ctrl-row">
               <span class="ctrl-label">Win streak (K)</span>
-              <select id="sel-k" onchange="applyConfig()">
+              <select id="sel-k" onchange="applyConfig()" aria-label="Win streak">
                 <option value="3" selected>3 in a row</option>
                 <option value="4">4 in a row</option>
                 <option value="5">5 in a row</option>
@@ -367,7 +367,7 @@
 
             <div class="ctrl-row">
               <span class="ctrl-label">AI solver</span>
-              <select id="sel-solver" onchange="applyConfig()">
+              <select id="sel-solver" onchange="applyConfig()" aria-label="AI solver">
                 <option value="dp" selected>DP (Memoized)</option>
                 <option value="bf">Brute Force</option>
               </select>
@@ -375,7 +375,7 @@
 
             <div class="ctrl-row">
               <span class="ctrl-label">Max depth</span>
-              <select id="sel-depth" onchange="applyConfig()">
+              <select id="sel-depth" onchange="applyConfig()" aria-label="Max depth">
                 <option value="-1" selected>Full search</option>
                 <option value="2">2</option>
                 <option value="4">4</option>
@@ -386,7 +386,7 @@
 
             <div class="ctrl-row">
               <span class="ctrl-label">You play as</span>
-              <select id="sel-human" onchange="applyConfig()">
+              <select id="sel-human" onchange="applyConfig()" aria-label="Human player">
                 <option value="X" selected>X (goes first)</option>
                 <option value="O">O (AI goes first)</option>
               </select>
