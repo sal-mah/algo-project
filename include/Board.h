@@ -31,6 +31,8 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
 // Represents what's in a single cell on the board
 enum class Cell {
     EMPTY,  // Cell has no mark yet
@@ -88,7 +90,7 @@ public:
     // The solvers call this to generate the list of legal moves
     // at each step of the minimax recursion.
     // ----------------------------------------------------------
-    std::vector<Move> getEmptyCells() const;
+    vector<Move> getEmptyCells() const;
 
     // ----------------------------------------------------------
     // getKey()
@@ -97,7 +99,7 @@ public:
     // Used by DPSolver as the cache lookup key.
     // NOTE: BruteForceSolver never calls this — only DPSolver does.
     // ----------------------------------------------------------
-    std::string getKey() const;
+    string getKey() const;
 
     // ----------------------------------------------------------
     // getCell(row, col)
@@ -113,5 +115,5 @@ public:
 private:
     int N;                          // Board dimension
     int K;                          // Win condition
-    std::vector<std::vector<Cell>> grid;  // The actual NxN grid
+    vector<vector<Cell>> grid;  // The actual NxN grid
 };

@@ -6,23 +6,25 @@
 #include <chrono>
 #include <limits>
 
+using namespace std;
+
 // Sets the maximum search depth and initializes an empty cache.
 DPSolver::DPSolver(int depth)
     : maxDepth(depth) {}
 
 // Runs memoized minimax and returns the best move for the current player.
 Move DPSolver::getBestMove(GameState& state) {
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = chrono::high_resolution_clock::now();
 
     bool isMaximizing = (state.getCurrentPlayer() == Cell::X);
 
     Move bestMove = {-1, -1};
     int bestScore = isMaximizing
-        ? std::numeric_limits<int>::min()
-        : std::numeric_limits<int>::max();
+        ? numeric_limits<int>::min()
+        : numeric_limits<int>::max();
 
     Board& board = state.getBoard();
-    std::vector<Move> moves = board.getEmptyCells();
+    vector<Move> moves = board.getEmptyCells();
 
     for (const Move& move : moves) {
         board.placeMark(move.row, move.col, state.getCurrentPlayer());
@@ -46,8 +48,8 @@ Move DPSolver::getBestMove(GameState& state) {
         }
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    metrics.timeMs = std::chrono::duration<double, std::milli>(end - start).count();
+    auto end = chrono::high_resolution_clock::now();
+    metrics.timeMs = chrono::duration<double, milli>(end - start).count();
 
     return bestMove;
 }
@@ -58,7 +60,7 @@ int DPSolver::minimax(GameState& state, int depth, bool isMaximizing) {
     metrics.nodesExplored++;
 
     // --- Cache lookup (the only difference from BruteForce) ---
-    std::string key = state.getBoard().getKey() + "|" + std::to_string(depth);
+    string key = state.getBoard().getKey() + "|" + to_string(depth);
     auto cached = cache.get(key);
     if (cached.has_value()) {
         metrics.cacheHits++;
@@ -73,12 +75,12 @@ int DPSolver::minimax(GameState& state, int depth, bool isMaximizing) {
     }
 
     Board& board = state.getBoard();
-    std::vector<Move> moves = board.getEmptyCells();
+    vector<Move> moves = board.getEmptyCells();
 
     int score;
 
     if (isMaximizing) {
-        score = std::numeric_limits<int>::min();
+        score = numeric_limits<int>::min();
         for (const Move& move : moves) {
             Cell currentCell = state.getCurrentPlayer();
             board.placeMark(move.row, move.col, currentCell);
@@ -92,7 +94,7 @@ int DPSolver::minimax(GameState& state, int depth, bool isMaximizing) {
             if (val > score) score = val;
         }
     } else {
-        score = std::numeric_limits<int>::max();
+        score = numeric_limits<int>::max();
         for (const Move& move : moves) {
             Cell currentCell = state.getCurrentPlayer();
             board.placeMark(move.row, move.col, currentCell);

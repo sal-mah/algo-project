@@ -1,16 +1,18 @@
 #include "../include/Cache.h"
 
+using namespace std;
+
 // Looks up a board key and returns the stored score, or nullopt on a miss.
-std::optional<int> Cache::get(const std::string& key) const {
+optional<int> Cache::get(const string& key) const {
     auto it = table.find(key);
     if (it != table.end()) {
         return it->second;   // cache hit — return stored score
     }
-    return std::nullopt;     // cache miss
+    return nullopt;     // cache miss
 }
 
 // Stores a newly computed minimax score for the given board key.
-void Cache::set(const std::string& key, int score) {
+void Cache::set(const string& key, int score) {
     table[key] = score;
 }
 

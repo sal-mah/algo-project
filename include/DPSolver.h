@@ -55,6 +55,8 @@
 #include "Metrics.h"
 #include "Cache.h"
 
+using namespace std;
+
 class DPSolver : public ISolver {
 public:
     // ----------------------------------------------------------
@@ -79,7 +81,7 @@ public:
     // Must be called before each benchmark run.
     void resetMetrics() override;
     
-    std::string name() const override { return "DP"; }
+    string name() const override { return "DP"; }
     
 
 private:

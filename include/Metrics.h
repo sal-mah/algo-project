@@ -28,6 +28,8 @@
 
 #pragma once
 
+using namespace std;
+
 struct Metrics {
     // Total number of board states visited during minimax.
     // Incremented once per recursive call in both solvers.
@@ -35,7 +37,7 @@ struct Metrics {
     int nodesExplored = 0;
 
     // How long getBestMove() took to complete, in milliseconds.
-    // Measured using std::chrono in the solver's getBestMove().
+    // Measured using chrono in the solver's getBestMove().
     double timeMs = 0.0;
 
     // How many times the DP cache returned an instant result

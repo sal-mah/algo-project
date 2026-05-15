@@ -36,7 +36,7 @@
 //   - Cache is owned by DPSolver — one Cache object per solver
 //   - clear() must be called between benchmark runs to avoid
 //     stale results from a previous board size or depth
-//   - std::optional<int> is used for get() so we can clearly
+//   - optional<int> is used for get() so we can clearly
 //     distinguish a cache hit (has value) from a miss (nullopt)
 // ============================================================
 
@@ -45,27 +45,29 @@
 #include <string>
 #include <optional>
 
+using namespace std;
+
 class Cache {
 public:
     // ----------------------------------------------------------
     // get(key)
     // Looks up a board key in the cache.
     // Returns the stored score if found (cache hit).
-    // Returns std::nullopt if not found (cache miss).
+    // Returns nullopt if not found (cache miss).
     //
     // Usage in DPSolver:
     //   auto result = cache.get(board.getKey());
     //   if (result.has_value()) return result.value(); // hit
     //   // otherwise recurse normally...
     // ----------------------------------------------------------
-    std::optional<int> get(const std::string& key) const;
+    optional<int> get(const string& key) const;
 
     // ----------------------------------------------------------
     // set(key, score)
     // Stores a computed minimax score in the cache.
     // Called by DPSolver AFTER recursing, before returning.
     // ----------------------------------------------------------
-    void set(const std::string& key, int score);
+    void set(const string& key, int score);
 
     // ----------------------------------------------------------
     // clear()
@@ -85,5 +87,5 @@ public:
 private:
     // The actual hash map: board string → minimax score
     // unordered_map gives O(1) average lookup and insert
-    std::unordered_map<std::string, int> table;
+    unordered_map<string, int> table;
 };

@@ -16,3 +16,14 @@ add_executable(AlgoProject
         src/Board.cpp
         src/Cache.cpp
 )
+
+add_executable(GameTrace
+        benchmark/run_game_trace.cpp
+
+        src/GameState.cpp
+        src/BruteForceSolver.cpp
+        src/DPSolver.cpp
+
+        src/Board.cpp
+        src/Cache.cpp
+)

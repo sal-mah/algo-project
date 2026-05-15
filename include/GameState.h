@@ -34,6 +34,8 @@
 #pragma once
 #include "Board.h"
 
+using namespace std;
+
 class GameState {
 public:
     // ----------------------------------------------------------

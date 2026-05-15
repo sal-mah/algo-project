@@ -44,6 +44,8 @@
 #include "Metrics.h"
 #include <string>
 
+using namespace std;
+
 class BruteForceSolver : public ISolver {
 public:
     BruteForceSolver() = default;
@@ -67,7 +69,7 @@ public:
     // Call this before every benchmark run.
     void resetMetrics() override;
 
-    std::string name() const override { return "BruteForce"; }
+    string name() const override { return "BruteForce"; }
 
 private:
     Metrics metrics;   // Filled in during each getBestMove() call

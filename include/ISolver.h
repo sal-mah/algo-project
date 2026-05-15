@@ -34,6 +34,8 @@
 #include "Board.h"      // for the Move struct
 #include <string>
 
+using namespace std;
+
 class ISolver {
 public:
     virtual ~ISolver() = default;
@@ -64,5 +66,5 @@ public:
 
     // Human-readable name used in benchmark output and the report.
     // BruteForceSolver returns "BruteForce", DPSolver returns "DP".
-    virtual std::string name() const = 0;
+    virtual string name() const = 0;
 };

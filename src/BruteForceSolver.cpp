@@ -2,6 +2,8 @@
 #include <limits>
 #include <chrono>
 #include <algorithm>
+
+using namespace std;
 // ── constructor ─────────────────────────────────────────────────────────────
 BruteForceSolver::BruteForceSolver(int depth)
     : maxDepth(depth) {}
@@ -66,13 +68,13 @@ int BruteForceSolver::minimax(GameState& state, int depth, bool isMaximizing) {
 
     // ── Recursive case ───────────────────────────────────────────────────────
     Board& board          = state.getBoard();
-    std::vector<Move> moves = board.getEmptyCells();
+    vector<Move> moves = board.getEmptyCells();
 
     // Determine which Cell token belongs to the current player
     Cell currentCell = state.getCurrentPlayer();   // Cell::X or Cell::O
 
     if (isMaximizing) {
-        int best = std::numeric_limits<int>::min();
+        int best = numeric_limits<int>::min();
 
         for (const Move& m : moves) { 
             board.placeMark(m.row, m.col, currentCell);  // apply
@@ -88,7 +90,7 @@ int BruteForceSolver::minimax(GameState& state, int depth, bool isMaximizing) {
         return best;
 
     } else { // Minimizing player
-        int best = std::numeric_limits<int>::max();
+        int best = numeric_limits<int>::max();
 
         for (const Move& m : moves) {
             board.placeMark(m.row, m.col, currentCell);  // apply
@@ -117,10 +119,10 @@ int BruteForceSolver::minimax(GameState& state, int depth, bool isMaximizing) {
 // Timing is measured around the full search and stored in metrics.timeMs.
 // Call resetMetrics() before calling this or counts will accumulate.
 Move BruteForceSolver::getBestMove(GameState& state) {
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = chrono::high_resolution_clock::now();
 
     Board& board            = state.getBoard();
-    std::vector<Move> moves = board.getEmptyCells();
+    vector<Move> moves = board.getEmptyCells();
 
     Move   bestMove   = {-1, -1};
     int    bestScore  = 0;
@@ -128,15 +130,15 @@ Move BruteForceSolver::getBestMove(GameState& state) {
     Cell   currentCell = state.getCurrentPlayer();
 
     if (maximizing) {
-        bestScore = std::numeric_limits<int>::min();
+        bestScore = numeric_limits<int>::min();
     } else {
-        bestScore = std::numeric_limits<int>::max();
+        bestScore = numeric_limits<int>::max();
     }
 
     // Search depth defaults to a full search unless maxDepth is provided.
     int depth = static_cast<int>(moves.size());
     if (maxDepth > 0) {
-        depth = std::min(maxDepth, depth);
+        depth = min(maxDepth, depth);
     }
 
     for (const Move& m : moves) {
@@ -157,8 +159,8 @@ Move BruteForceSolver::getBestMove(GameState& state) {
         }
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    metrics.timeMs = std::chrono::duration<double, std::milli>(end - start).count();
+    auto end = chrono::high_resolution_clock::now();
+    metrics.timeMs = chrono::duration<double, milli>(end - start).count();
 
     return bestMove;
 }
