@@ -442,13 +442,41 @@
         console.warn(`No C++ trace found for solver=${solver} N=${state.cfg.N} K=${state.cfg.K} depth=${state.cfg.maxDepth} move=${state.moveLog.length + 1}`);
         return;
       }
+      
+      // For human-vs-ai, auto-limit depth to prevent browser lag
+      let effectiveDepth = state.cfg.maxDepth;
+      const N = state.cfg.N;
+      
+      // Auto-limit depth based on board size to prevent lag
+      if (effectiveDepth === -1) {  // Full search requested
+        if (N >= 5) {
+          effectiveDepth = 2;  // 5×5: max depth 2
+          console.warn(`⚠️ Auto-limiting depth to 2 for 5×5 board to prevent lag`);
+        } else if (N === 4) {
+          effectiveDepth = 3;  // 4×4: max depth 3 (4 causes lag)
+          console.warn(`⚠️ Auto-limiting depth to 3 for 4×4 board to prevent lag`);
+        } else {
+          effectiveDepth = 8;  // 3×3: allow full search
+        }
+      } else if (N === 4 && effectiveDepth > 3) {
+        // Force cap on 4×4
+        const oldDepth = effectiveDepth;
+        effectiveDepth = 3;
+        console.warn(`⚠️ Capping depth from ${oldDepth} to 3 for 4×4 board to prevent lag`);
+      } else if (N === 5 && effectiveDepth > 2) {
+        // Force cap on 5×5
+        const oldDepth = effectiveDepth;
+        effectiveDepth = 2;
+        console.warn(`⚠️ Capping depth from ${oldDepth} to 2 for 5×5 board to prevent lag`);
+      }
+      
       result = TicTacSolver.getBestMove(
         state.board.slice(),
         state.cfg.N,
         state.cfg.K,
         state.currentPlayer,
         solver,
-        state.cfg.maxDepth
+        effectiveDepth
       );
     }
 

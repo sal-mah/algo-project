@@ -868,7 +868,7 @@
     const N = parseInt(document.getElementById('sel-n').value);
     const K = parseInt(document.getElementById('sel-k').value);
     const solver = document.getElementById('sel-solver').value;
-    const depth  = parseInt(document.getElementById('sel-depth').value);
+    let depth  = parseInt(document.getElementById('sel-depth').value);
     const human  = document.getElementById('sel-human').value;
 
     // Clamp K to N
@@ -877,19 +877,60 @@
     const clampedK = Math.min(K, N);
     selK.value = clampedK;
 
-    // Update solver info text
+    // ── Auto-limit depth for safety ──────────────────────────────────────────
+    let depthWarning = '';
+    const selDepth = document.getElementById('sel-depth');
+    
+    // Disable unsafe depth options based on board size
+    for (let opt of selDepth.options) {
+      const d = parseInt(opt.value);
+      if (N === 3) {
+        opt.disabled = false;  // 3×3: all depths OK
+      } else if (N === 4) {
+        // 4×4: Brute Force times out at depth ≥ 8, but lag starts earlier in JS
+        // Full search (-1) and depth ≥ 5 are too slow in browser
+        opt.disabled = (d === -1 || d >= 5);
+      } else if (N === 5) {
+        // 5×5: Only depths 2 and 4 are safe in browser
+        opt.disabled = (d === -1 || d >= 5);
+      }
+    }
+    
+    // If currently selected depth is now disabled, snap to highest allowed
+    if (selDepth.options[selDepth.selectedIndex].disabled) {
+      for (let i = selDepth.options.length - 1; i >= 0; i--) {
+        if (!selDepth.options[i].disabled) {
+          selDepth.selectedIndex = i;
+          depth = parseInt(selDepth.options[i].value);
+          break;
+        }
+      }
+    }
+    
+    // Add warning for risky combinations
+    if (solver === 'bf' && N >= 4 && depth >= 4) {
+      depthWarning = '⚠️ BF on 4×4+ with depth ≥4 may freeze browser';
+    } else if (solver === 'dp' && N === 5 && depth >= 6) {
+      depthWarning = '⚠️ DP on 5×5 with depth ≥6 may be slow';
+    } else if (N >= 5 && depth === -1) {
+      depthWarning = '⚠️ Full search on 5×5+ is not allowed — auto-limiting to depth 2';
+    }
+
+    // Update solver info text with warnings
     const infoEl = document.getElementById('solver-info');
     if (solver === 'dp') {
       infoEl.innerHTML = `<strong style="color:var(--accent2)">DP (Memoized)</strong> — caches board states
         so each unique position is evaluated only once.
         Cache key = board string + depth.
-        Time complexity: <strong>O(U·b)</strong> where U = unique board states.`;
+        Time complexity: <strong>O(U·b)</strong> where U = unique board states.
+        ${depthWarning ? '<br><span style="color:var(--warn);font-size:12px">' + depthWarning + '</span>' : ''}`;
     } else {
       infoEl.innerHTML = `<strong style="color:var(--danger)">Brute Force</strong> — no cache.
         Every board state is recomputed from scratch even if seen before.
         Watch nodes skyrocket on larger boards.
         Time complexity: <strong>O(b<sup>d</sup>)</strong>.
-        <br><span style="color:var(--warn);font-size:12px">⚠ Avoid full search on 4×4 or 5×5 — it may freeze the browser.</span>`;
+        ${depthWarning ? '<br><span style="color:var(--warn);font-size:12px">' + depthWarning + '</span>' : ''}
+        <br><span style="color:var(--warn);font-size:12px">⚠ Avoid BF on 4×4 or 5×5 — use DP instead.</span>`;
     }
 
     BoardController.setConfig({ N, K: clampedK, humanPlayer: human, aiSolver: solver, maxDepth: depth });
