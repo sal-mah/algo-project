@@ -52,7 +52,7 @@ CMakeLists.txt.user
 
 # Results and output files (if not tracking benchmarks)
 results/*.txt
-results/*.csv
+# results/*.csv  (commented out to include in deployment)
 results/*.json
 
 # Executable in root

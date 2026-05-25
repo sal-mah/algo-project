@@ -14,7 +14,7 @@ DPSolver::DPSolver(int depth)
 
 // Runs memoized minimax and returns the best move for the current player.
 Move DPSolver::getBestMove(GameState& state) {
-    auto start = chrono::high_resolution_clock::now();
+    auto start = chrono::high_resolution_clock::now(); // Start the timer at the beginning of the search
 
     bool isMaximizing = (state.getCurrentPlayer() == Cell::X);
 

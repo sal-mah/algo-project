@@ -119,7 +119,7 @@ int BruteForceSolver::minimax(GameState& state, int depth, bool isMaximizing) {
 // Timing is measured around the full search and stored in metrics.timeMs.
 // Call resetMetrics() before calling this or counts will accumulate.
 Move BruteForceSolver::getBestMove(GameState& state) {
-    auto start = chrono::high_resolution_clock::now();
+    auto start = chrono::high_resolution_clock::now(); // Start the timer at the beginning of the search
 
     Board& board            = state.getBoard();
     vector<Move> moves = board.getEmptyCells();
@@ -159,8 +159,8 @@ Move BruteForceSolver::getBestMove(GameState& state) {
         }
     }
 
-    auto end = chrono::high_resolution_clock::now();
-    metrics.timeMs = chrono::duration<double, milli>(end - start).count();
+    auto end = chrono::high_resolution_clock::now(); // Stop the timer after the full search is done
+    metrics.timeMs = chrono::duration<double, milli>(end - start).count(); // Store elapsed time in metrics
 
     return bestMove;
 }
