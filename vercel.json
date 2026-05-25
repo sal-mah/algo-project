@@ -4,8 +4,16 @@
   "public": true,
   "routes": [
     {
-      "src": "/(.*\\.(csv|js|css|png|jpg|svg|ico|html))$",
-      "dest": "/$1"
+      "src": "/results/(.*\\.csv)$",
+      "dest": "/results/$1"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/visualization/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|svg|ico))$",
+      "dest": "/visualization/$1"
     },
     {
       "src": "/.*",
