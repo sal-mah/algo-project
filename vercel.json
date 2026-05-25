@@ -1,5 +1,15 @@
 {
+  "version": 2,
   "buildCommand": "",
-  "outputDirectory": "visualization/",
-  "public": true
+  "public": true,
+  "routes": [
+    {
+      "src": "/(.*\\.(csv|js|css|png|jpg|svg|ico|html))$",
+      "dest": "/$1"
+    },
+    {
+      "src": "/.*",
+      "dest": "/visualization/Index.html"
+    }
+  ]
 }
